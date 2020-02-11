@@ -1,37 +1,23 @@
-import React from 'react'
-import { cleanup, render, fireEvent } from '@testing-library/react'
+import React from 'react';
+import { useSelector } from 'react-redux';
+import { cleanup, render } from '@testing-library/react';
 
 import TechList from '~/components/TechList';
+
+jest.mock('react-redux');
 
 afterEach(cleanup)
 
 describe('TechList component', () => {
-  beforeEach(() => {
-    localStorage.clear();
-  });
+  it('should tender tech list', () => {
+    useSelector.mockImplementation(cb => cb({
+      techs: ['Node.js', 'ReactJS']
+    }     
+    ));
 
-  it('Should be able to add new tech', () => {
-   const { getByText, getByTestId, getByLabelText } =  render(<TechList />)  
-   
-   fireEvent.change(getByLabelText('Tech'), { target: { value: 'Node.js'} } );
-   fireEvent.submit(getByTestId('tech-form'));  
-   
-   expect(getByTestId('tech-list')).toContainElement(getByText('Node.js'));
-   expect(getByLabelText('Tech')).toHaveValue('');
-  })
+    const { getByText, getByTestId } = render(<TechList />)
 
-  it('should store techs in storage', () => {
-    let { getByTestId,  getByText, getByLabelText } =  render(<TechList />)  
-    
-    fireEvent.change(getByLabelText('Tech'), { target: { value: 'Node.js'} } );
-    fireEvent.submit(getByTestId('tech-form'));  
-
-    cleanup();
-
-    ({ getByTestId, getByLabelText, getByLabelText } =  render(<TechList />)) 
-    
-    expect(localStorage.setItem).toHaveBeenLastCalledWith('techs', JSON.stringify(['Node.js']));
     expect(getByTestId('tech-list')).toContainElement(getByText('Node.js'));
-
+    expect(getByTestId('tech-list')).toContainElement(getByText('ReactJS'));
   });
-})
+});
